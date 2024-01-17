@@ -4,15 +4,12 @@ BLFU=/home/feczk001/shared/projects/BLFU
 code=${BLFU}/code
 BLFU_BIDS=/home/feczk001/shared/projects/BLFU/BIDS2
 
-# if [ ${#} -eq 1 ] ; then
-#     task=${1}
-# else
-#     echo "Usage: ${0} sub"
-#     exit 1
-# fi
+if [ ${#} -gt 0 ] ; then
+    subs=${*}
+else
+    subs=$(echo BLFU{100619,710922,714783,800807,938316,961964})
+fi
 
-# subs=$(echo BLFU{100619,710922,714783,800807,938316,961964})
-subs=BLFU100619
 
 for sub in ${subs} ; do
 

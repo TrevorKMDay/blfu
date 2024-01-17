@@ -58,6 +58,9 @@ cp -r ${BLFU_BIDS}/dataset_description.json "${tmp_BIDS}/"
 rsync -r --progress "${BLFU_BIDS}/sub-${sub}/ses-${ses}" \
     "${tmp_BIDS}/sub-${sub}"
 
+# Delete README files from merge from temp dir
+find "${tmp_BIDS}/sub-${sub}" -name "README" -delete
+
 mkdir -p ${BLFU_out}
 
 # Following option suggestions in DCAN fmriprep RTD

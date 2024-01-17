@@ -16,6 +16,13 @@ subs1=$(echo sub-BLFU{710922,714783,961964})
 subs2=$(echo sub-BLFU{800807,938316,100619})
 subs="${subs1} ${subs2}"
 
+force=false
+while getopts f flag ; do 
+    case "${flag}" in
+        f) force=true ;;
+    esac
+done
+
 echo "Subs identified:"
 echo "  ${subs}"
 
@@ -104,15 +111,6 @@ for sub in ${subs} ; do
                 echo "Merging ${sub} ses-${session}${wave} A1 and A2"
                 echo "  saving to: ${combined_out}"
 
-                for i in ${source_A1} ${source_A2} ; do
-
-                    # Don't quote find to allow word separation
-                    python3 ${code}/set-IF.py \
-                        --jsons "${i}"/fmap/*.json \
-                        --bolds $(find "${i}"/func/ -name "*.nii.gz")
-
-                done
-
                 # Args: bids_dir sub_value sessions_to_merge new_session_name
                 ${code}/merge-attempts.sh   \
                     ${BIDS}                 \
@@ -122,18 +120,27 @@ for sub in ${subs} ; do
 
             fi
 
-            if [ -e "${BIDS2_out}" ] ; then
+            if [ -e "${BIDS2_out}" ] & [[ ${force} == "false" ]]  ; then
 
                 echo "    ${BIDS2_out} already exists."
-                echo "    Delete to re-copy"
+                echo "    Delete to re-copy (or set -f)"
                 echo "  Done with BLFU${wave}"
 
             else
 
+                dest="${BIDS2}/${sub}/ses-${session}${wave}"
+
+                rm -rf ${dest}
+
                 # Copy nifti_desc-combined session dir to BIDS2 sub dir
                 echo "    Copying ${combined_out} to ${BIDS2}/${sub}/"
-                cp -R "${combined_out}" "${BIDS2}/${sub}/ses-${session}${wave}"
+                cp -R "${combined_out}" "${dest}"
                 echo "  Done with BLFU${wave}"
+
+                # Don't quote find to allow word separation
+                python3 ${code}/set-IF.py \
+                    --jsons "${dest}"/fmap/*.json \
+                    --bolds "${dest}"/func/*.nii.gz
 
             fi
 
